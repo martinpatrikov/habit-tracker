@@ -3,35 +3,11 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.event.*;
-import java.io.*;
 import java.util.*;
 
 public class HabitTracker extends JFrame {
-
-    // store table in file
-    public static void weekChange(String change, DefaultTableModel model){
-        // show the next seven days
-        // change column names to next seven days
-        int temp;
-        // set table values to ""
-        for (int i = 0; i < model.getRowCount(); i++) {
-            for (int j = 0; j < model.getColumnCount() - 1; j++) {
-                model.setValueAt("", i, j + 1);
-            }
-        }
-        if (change.equals("next")) {
-            temp = Integer.parseInt(model.getColumnName(1)) + 6;
-        }else{
-            temp = Integer.parseInt(model.getColumnName(1)) - 8;
-        }
-        if(temp >= 0){
-            model.setColumnIdentifiers(new Object[] { "Habits\\Days", temp + 1, temp + 2, temp + 3, temp + 4, temp + 5, temp + 6, temp + 7 });
-        }
-
-    }
-
     // method for the action of buttons DONE and MISSED
-    public static void checkingButtionsAction(String check, JComboBox<String> cb, DefaultTableModel model) {
+    public static void checkingButtonsAction(String check, JComboBox<String> cb, DefaultTableModel model) {
         String chosenHabit = cb.getSelectedItem().toString();
         // going through every row in the first column of the table
         for (int i = 0; i < model.getRowCount(); i++) {
@@ -51,9 +27,9 @@ public class HabitTracker extends JFrame {
     }
 
     public static void main(String[] args) {
-
         JFrame frame = new JFrame("Habit Tracker");
-        frame.setSize(1000, 650);
+        frame.setSize(1300, 600);
+        frame.getContentPane().setBackground(Color.decode("#354f52")  );
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // main containers and Layouts
@@ -69,21 +45,9 @@ public class HabitTracker extends JFrame {
 
         JPanel tablePanel = new JPanel();
         mainPanel.add(tablePanel);
-        tablePanel.setPreferredSize(new Dimension(800, 300));
+        tablePanel.setPreferredSize(new Dimension(1100, 300));
         tablePanel.setBackground(Color.LIGHT_GRAY);
         tablePanel.setLayout(new BoxLayout(tablePanel, BoxLayout.Y_AXIS));
-
-
-        // add buttons for right and left scrolling in tablePanel
-        JButton leftButton = new JButton("<");
-        JButton rightButton = new JButton(">");
-        JComponent tablePanelButtons = new JPanel();
-        tablePanelButtons.setLayout(new BoxLayout(tablePanelButtons, BoxLayout.LINE_AXIS));
-        tablePanelButtons.add(leftButton);
-        tablePanelButtons.add(Box.createHorizontalGlue());
-        tablePanelButtons.add(rightButton);
-
-        tablePanel.add(tablePanelButtons);
 
         // using as border between tablePanel and rightPanel
         JPanel rightBorderPanel = new JPanel();
@@ -93,7 +57,7 @@ public class HabitTracker extends JFrame {
 
         JPanel rightPanel = new JPanel();
         mainPanel.add(rightPanel);
-        rightPanel.setBackground(Color.WHITE);
+        rightPanel.setBackground(Color.decode("#52796f"));
         rightPanel.setBorder(BorderFactory.createLineBorder(Color.black));
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
 
@@ -116,12 +80,13 @@ public class HabitTracker extends JFrame {
 
             // set color of missed/done cells
             public Component prepareRenderer(TableCellRenderer r, int row, int column) {
+
                 Component cell = super.prepareRenderer(r, row, column);
                 Object value = getModel().getValueAt(row, column);
                 if (value != null) {
-                    if (value.equals("missed")) {
+                    if (value.equals("-")) {
                         cell.setBackground(Color.red);
-                    } else if (value.equals("done")) {
+                    } else if (value.equals("+")) {
                         cell.setBackground(Color.green);
                     } else {
                         cell.setBackground(Color.white);
@@ -140,22 +105,20 @@ public class HabitTracker extends JFrame {
         habitsTable.getTableHeader().setReorderingAllowed(false);
 
         habitsTableModel.addColumn("Habits\\Days");
-        habitsTable.getColumnModel().getColumn(0).setMinWidth(200);
-        for (int i = 0; i < 7; i++) {
+        habitsTable.getColumnModel().getColumn(0).setMinWidth(300);
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment( JLabel.CENTER );
+
+        for (int i = 0; i < 21; i++) {
             habitsTableModel.addColumn(String.valueOf(i + 1));
+        }
+        for (int i = 0; i < 21; i++) {
+            habitsTable.getColumnModel().getColumn(i + 1).setMaxWidth(50);
+            habitsTable.getColumnModel().getColumn(i + 1).setCellRenderer( centerRenderer );;
         }
 
         // clicking on right button scrolls table to the right
-        rightButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                weekChange("next", habitsTableModel);
-            }
-        });
-        leftButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                weekChange("prev", habitsTableModel);
-            }
-        });
+
 //        habitsTableModel.insertRow(0, new Object[] { "Habits" });
         tablePanel.add(new JScrollPane(habitsTable));
 
@@ -171,6 +134,7 @@ public class HabitTracker extends JFrame {
         gbc.insets = new Insets(5, 5, 5, 5);
 
         JLabel checkLabel = new JLabel("Choose habit to check: ");
+        checkLabel.setForeground(Color.WHITE);
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.gridwidth = 2;
@@ -193,6 +157,7 @@ public class HabitTracker extends JFrame {
         rightPanel.add(dropDownMenu, gbc);
 
         JButton doneButton = new JButton("Done");
+        doneButton.setBackground(Color.decode("#cad2c5"));
         gbc.gridx = 2;
         gbc.gridy = 3;
         gbc.gridwidth = 1;
@@ -201,11 +166,16 @@ public class HabitTracker extends JFrame {
 
         doneButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                checkingButtionsAction("done", dropDownMenu, habitsTableModel);
+                checkingButtonsAction("+", dropDownMenu, habitsTableModel);
             }
         });
 
         JButton missedButton = new JButton("Missed");
+        missedButton.setBorderPainted(false);
+        missedButton.setFocusPainted(false);
+        missedButton.setBorder(new RoundedBorder(10));
+//        missedButton.setContentAreaFilled(false);
+        missedButton.setBackground(Color.decode("#52796f"));
         gbc.gridx = 1;
         gbc.gridy = 3;
         gbc.gridwidth = 1;
@@ -214,11 +184,12 @@ public class HabitTracker extends JFrame {
 
         missedButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                checkingButtionsAction("missed", dropDownMenu, habitsTableModel);
+                checkingButtonsAction("-", dropDownMenu, habitsTableModel);
             }
         });
 
         JLabel addLabel = new JLabel("Write habit to add: ");
+        addLabel.setForeground(Color.WHITE);
         gbc.gridx = 1;
         gbc.gridy = 4;
         gbc.gridwidth = 2;
@@ -233,6 +204,9 @@ public class HabitTracker extends JFrame {
         rightPanel.add(addHabit, gbc);
 
         JButton addButton = new JButton("Add habit");
+        addButton.setBorderPainted(false);
+        addButton.setFocusPainted(false);
+        addButton.setBorder(new RoundedBorder(10));
         gbc.gridx = 1;
         gbc.gridy = 6;
         gbc.gridwidth = 2;
@@ -241,7 +215,6 @@ public class HabitTracker extends JFrame {
 
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
                 String habitToAdd = addHabit.getText();
                 habitsTableModel.insertRow(habitsTableModel.getRowCount(), new Object[] { habitToAdd });
                 dropDownMenu.addItem(habitToAdd);
