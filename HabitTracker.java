@@ -8,20 +8,33 @@ import java.util.*;
 public class HabitTracker extends JFrame {
     // method for the action of buttons DONE and MISSED
     public static void checkingButtonsAction(String check, JComboBox<String> cb, DefaultTableModel model) {
-        String chosenHabit = cb.getSelectedItem().toString();
-        // going through every row in the first column of the table
-        for (int i = 0; i < model.getRowCount(); i++) {
-            if (model.getValueAt(i, 0).equals(chosenHabit)) {
-                // going through every cell in the selected row
-                for (int j = 0; j < model.getColumnCount() - 1; j++) {
-                    // finding the first empty cell of the row
-                    if (model.getValueAt(i, j + 1) == null) {
-                        model.setValueAt(check, i, j + 1);
-                        break;
+        if(cb.getSelectedItem() != null){
+            String chosenHabit = cb.getSelectedItem().toString();
+
+            // going through every row in the first column of the table
+            for (int i = 0; i < model.getRowCount(); i++) {
+
+                if (model.getValueAt(i, 0).equals(chosenHabit)) {
+                    // going through every cell in the selected row
+                    int miss = 0;
+                    for (int j = 0; j < model.getColumnCount() - 1; j++) {
+                        if(model.getValueAt(i, j + 1) == "-"){
+                            miss = j;
+                        }
+                        // finding the first empty cell of the row
+                        if (model.getValueAt(i, j + 1) == null) {
+                            model.setValueAt(check, i, j + 1);
+                            if(j  >= 20 && check.equals("+") && j - miss > 20){
+                                JOptionPane.showMessageDialog(null, "You have already done this habit for 21 days in a row!");
+                            }
+                            break;
+                        }
                     }
+                    break;
                 }
-                break;
             }
+        }else{
+            JOptionPane.showMessageDialog(new JFrame("temp"), "Please select a habit from the list");
         }
 //        storeTableModel(model);
     }
@@ -32,10 +45,29 @@ public class HabitTracker extends JFrame {
         frame.getContentPane().setBackground(Color.decode("#354f52")  );
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+
+        JPanel basePanel = new JPanel();
+        frame.add(basePanel);
+        basePanel.setLayout(new BoxLayout(basePanel, BoxLayout.Y_AXIS));
+
+        JPanel titlePanel = new JPanel();
+        titlePanel.setBackground(Color.decode("#674747"));
+        titlePanel.setPreferredSize(new Dimension(100, 100));
+        JLabel title = new JLabel("Habit Tracker");
+        title.setFont(new Font("Arial", Font.BOLD, 40));
+        title.setForeground(Color.WHITE);
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titlePanel.add(title);
+        basePanel.add(titlePanel);
+
         // main containers and Layouts
         JPanel mainPanel = new JPanel();
-        frame.add(mainPanel);
+        basePanel.add(mainPanel);
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.X_AXIS));
+//        frame.add(mainPanel);
+        // add panel at the top for the title
+        // add the title
+//        mainPanel.add(titlePanel);
 
         // using as border between tablePanel and the left frame
         JPanel leftBorderPanel = new JPanel();
@@ -57,7 +89,7 @@ public class HabitTracker extends JFrame {
 
         JPanel rightPanel = new JPanel();
         mainPanel.add(rightPanel);
-        rightPanel.setBackground(Color.decode("#52796f"));
+        rightPanel.setBackground(Color.decode("#674747"));
         rightPanel.setBorder(BorderFactory.createLineBorder(Color.black));
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
 
@@ -85,11 +117,11 @@ public class HabitTracker extends JFrame {
                 Object value = getModel().getValueAt(row, column);
                 if (value != null) {
                     if (value.equals("-")) {
-                        cell.setBackground(Color.red);
+                        cell.setBackground(Color.decode("#FF6464"));
                     } else if (value.equals("+")) {
-                        cell.setBackground(Color.green);
+                        cell.setBackground(Color.decode("#B3FFAE"));
                     } else {
-                        cell.setBackground(Color.white);
+                        cell.setBackground(Color.decode("#F8FFDB"));
                     }
                 } else {
                     cell.setBackground(Color.white);
@@ -109,10 +141,10 @@ public class HabitTracker extends JFrame {
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment( JLabel.CENTER );
 
-        for (int i = 0; i < 21; i++) {
+        for (int i = 0; i < 31; i++) {
             habitsTableModel.addColumn(String.valueOf(i + 1));
         }
-        for (int i = 0; i < 21; i++) {
+        for (int i = 0; i < 31; i++) {
             habitsTable.getColumnModel().getColumn(i + 1).setMaxWidth(50);
             habitsTable.getColumnModel().getColumn(i + 1).setCellRenderer( centerRenderer );;
         }
@@ -171,11 +203,8 @@ public class HabitTracker extends JFrame {
         });
 
         JButton missedButton = new JButton("Missed");
-        missedButton.setBorderPainted(false);
-        missedButton.setFocusPainted(false);
-        missedButton.setBorder(new RoundedBorder(10));
-//        missedButton.setContentAreaFilled(false);
-        missedButton.setBackground(Color.decode("#52796f"));
+        missedButton.setBackground(Color.decode("#cad2c5"));
+
         gbc.gridx = 1;
         gbc.gridy = 3;
         gbc.gridwidth = 1;
@@ -204,9 +233,8 @@ public class HabitTracker extends JFrame {
         rightPanel.add(addHabit, gbc);
 
         JButton addButton = new JButton("Add habit");
-        addButton.setBorderPainted(false);
-        addButton.setFocusPainted(false);
-        addButton.setBorder(new RoundedBorder(10));
+        addButton.setBackground(Color.decode("#cad2c5"));
+
         gbc.gridx = 1;
         gbc.gridy = 6;
         gbc.gridwidth = 2;
