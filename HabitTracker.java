@@ -5,7 +5,8 @@ import javax.swing.table.*;
 import java.util.*;
 
 public class HabitTracker extends JFrame {
-    public static void activityButtonsAction(String check, JComboBox<String> cb, DefaultTableModel model, JComboBox<String> dropDownMenu) {
+
+    public static void activityButtonsAction(String check, JComboBox<String> cb, DefaultTableModel model, JComboBox<String> dropDownMenu, DefaultListModel<String> builtHabits) {
         if(cb.getSelectedItem() != null){
             String chosenHabit = cb.getSelectedItem().toString();
 
@@ -20,7 +21,8 @@ public class HabitTracker extends JFrame {
                         if (model.getValueAt(i, j + 1) == null) {
                             model.setValueAt(check, i, j + 1);
                             if(j  >= 20 && check.equals("+") && j - miss > 20){
-                                JOptionPane.showMessageDialog(null, "You have successfully build a new healthy habit!");
+                                builtHabits.addElement(chosenHabit);
+                                JOptionPane.showMessageDialog(null, "You have successfully built a new healthy habit!");
                                 dropDownMenu.removeItemAt(dropDownMenu.getSelectedIndex());
                                 model.removeRow(i);
                             }
@@ -41,6 +43,7 @@ public class HabitTracker extends JFrame {
         frame.getContentPane().setBackground(Color.decode("#354f52"));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        DefaultListModel<String> builtHabits = new DefaultListModel<String>();
 
         JPanel basePanel = new JPanel();
         frame.add(basePanel);
@@ -134,10 +137,24 @@ public class HabitTracker extends JFrame {
         GridBagConstraints gridConstraints = new GridBagConstraints();
         gridConstraints.insets = new Insets(5, 5, 5, 5);
 
+        JLabel builtHabitsLabel = new JLabel("Built habits: ");
+        builtHabitsLabel.setForeground(Color.WHITE);
+        gridConstraints.gridwidth = 2;
+        gridConstraints.fill = GridBagConstraints.HORIZONTAL;
+        rightPanel.add(builtHabitsLabel, gridConstraints);
+
+        JList<String> builtHabitsPane = new JList<>(builtHabits);
+        builtHabitsPane.setPreferredSize(new Dimension(50,100));
+        gridConstraints.gridx = 1;
+        gridConstraints.gridy = 1;
+        gridConstraints.gridwidth = 2;
+        gridConstraints.fill = GridBagConstraints.HORIZONTAL;
+        rightPanel.add(builtHabitsPane, gridConstraints);
+
         JLabel checkLabel = new JLabel("Choose habit: ");
         checkLabel.setForeground(Color.WHITE);
         gridConstraints.gridx = 1;
-        gridConstraints.gridy = 1;
+        gridConstraints.gridy = 2;
         gridConstraints.gridwidth = 2;
         gridConstraints.fill = GridBagConstraints.HORIZONTAL;
         rightPanel.add(checkLabel, gridConstraints);
@@ -147,7 +164,7 @@ public class HabitTracker extends JFrame {
         JComboBox<String> dropDownMenu = new JComboBox<>();
 
         gridConstraints.gridx = 1;
-        gridConstraints.gridy = 2;
+        gridConstraints.gridy = 3;
         gridConstraints.gridwidth = 2;
         gridConstraints.fill = GridBagConstraints.HORIZONTAL;
         rightPanel.add(dropDownMenu, gridConstraints);
@@ -155,35 +172,35 @@ public class HabitTracker extends JFrame {
         JButton doneButton = new JButton("Done");
         doneButton.setBackground(Color.decode("#cad2c5"));
         gridConstraints.gridx = 2;
-        gridConstraints.gridy = 3;
+        gridConstraints.gridy = 4;
         gridConstraints.gridwidth = 1;
         gridConstraints.fill = GridBagConstraints.HORIZONTAL;
         rightPanel.add(doneButton, gridConstraints);
 
-        doneButton.addActionListener(e -> activityButtonsAction("+", dropDownMenu, tableModel, dropDownMenu));
+        doneButton.addActionListener(e -> activityButtonsAction("+", dropDownMenu, tableModel, dropDownMenu, builtHabits));
 
         JButton missedButton = new JButton("Missed");
         missedButton.setBackground(Color.decode("#cad2c5"));
 
         gridConstraints.gridx = 1;
-        gridConstraints.gridy = 3;
+        gridConstraints.gridy = 4;
         gridConstraints.gridwidth = 1;
         gridConstraints.fill = GridBagConstraints.HORIZONTAL;
         rightPanel.add(missedButton, gridConstraints);
 
-        missedButton.addActionListener(e -> activityButtonsAction("-", dropDownMenu, tableModel, dropDownMenu));
+        missedButton.addActionListener(e -> activityButtonsAction("-", dropDownMenu, tableModel, dropDownMenu, builtHabits));
 
         JLabel addLabel = new JLabel("New habit:");
         addLabel.setForeground(Color.WHITE);
         gridConstraints.gridx = 1;
-        gridConstraints.gridy = 4;
+        gridConstraints.gridy = 5;
         gridConstraints.gridwidth = 2;
         gridConstraints.fill = GridBagConstraints.HORIZONTAL;
         rightPanel.add(addLabel, gridConstraints);
 
         JTextField addHabit = new JTextField();
         gridConstraints.gridx = 1;
-        gridConstraints.gridy = 5;
+        gridConstraints.gridy = 6;
         gridConstraints.gridwidth = 2;
         gridConstraints.fill = GridBagConstraints.HORIZONTAL;
         rightPanel.add(addHabit, gridConstraints);
@@ -192,7 +209,7 @@ public class HabitTracker extends JFrame {
         addButton.setBackground(Color.decode("#cad2c5"));
 
         gridConstraints.gridx = 1;
-        gridConstraints.gridy = 6;
+        gridConstraints.gridy = 7;
         gridConstraints.gridwidth = 2;
         gridConstraints.fill = GridBagConstraints.HORIZONTAL;
         rightPanel.add(addButton, gridConstraints);
